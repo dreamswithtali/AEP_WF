@@ -1,0 +1,35 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 3 > Task 2 > Step 3
+select placeContext.geo
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.productData.productInteraction = 'productView'
+and placeContext.geo.countryCode <> ''
+limit 1;
+
+
+Module 4> Exercise 3 > Task 2 > Step 6
+select placeContext.geo._schema.longitude
+      ,placeContext.geo._schema.latitude
+      ,placeContext.geo.city
+      ,placeContext.geo.countryCode
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.productData.productInteraction = 'productView'
+and placeContext.geo.countryCode <> ''
+limit 1;
+
+
+Module 4> Exercise 3 > Task 2 > Step 10
+select <your_attribute_path_here>
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.productData.productInteraction = 'productView'
+and placeContext.geo.countryCode <> ''
+limit 1;
+
+
+Module 4 > Exercise 3 > Task 2 > Step 21
+select placeContext.geo._schema.longitude
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.productData.productInteraction = 'productView'
+and placeContext.geo.countryCode <> ''
+limit 1;

@@ -1,0 +1,25 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 9 > Step 1
+
+select /* enter your name */
+       e._adlsplatformus.identification.core.ecid as ecid,
+       e.placeContext.geo.city as city,
+       e.placeContext.geo._schema.latitude latitude,
+       e.placeContext.geo._schema.longitude longitude,
+       e.placeContext.geo.countryCode as countrycode,
+       c._adlsplatformus.callDetails.callFeeling as callFeeling,
+       c._adlsplatformus.callDetails.callTopic as callTopic,
+       c._adlsplatformus.callDetails.contractCancelled as contractCancelled,
+       l._adlsplatformus.loyaltyDetails.level as loyaltystatus,
+       l._adlsplatformus.loyaltyDetails.points as loyaltypoints,
+       l._adlsplatformus.identification.core.crmId as crmid
+from   aep_demo_luma_telco_website_interactions_dataset e
+      ,aep_demo_luma_telco_call_center_interactions_dataset c
+      ,demo_system_profile_dataset_for_crm_global_v1_1 l
+where  e._adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+and    e.web.webPageDetails.name in ('Cancel Service', 'Call Start')
+and    e._adlsplatformus.identification.core.ecid = c._adlsplatformus.identification.ecid
+and    l._adlsplatformus.identification.core.ecid = e._adlsplatformus.identification.core.ecid;
+
+

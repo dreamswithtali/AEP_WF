@@ -1,0 +1,5 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 1 > Task 2 > Step 2
+
+Show tables;

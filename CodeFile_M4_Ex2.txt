@@ -1,0 +1,8 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 2 > Task 1 > Step 3
+psql -V
+
+Module 4 > Exercise 2 > Task 3 > Step 1
+Show tables;
+

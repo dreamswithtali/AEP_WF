@@ -1,0 +1,41 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 5 > Task 1 > Step 3
+select date_format( timestamp , 'yyyy-MM-dd') AS Day,
+       count(*) AS productViews
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+and    _adlsplatformus.productData.productInteraction = 'productView'
+group by Day
+limit 10;
+
+
+Module 4 > Exercise 5 > Task 2 > Step 2
+select _adlsplatformus.productData.productName, count(*)
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+and    _adlsplatformus.productData.productInteraction = 'productView'
+group  by _adlsplatformus.productData.productName
+order  by 2 desc
+limit 5;
+
+
+Module 4 > Exercise 5 > Task 3 > Step 2
+
+select _adlsplatformus.productData.productInteraction, count(*)
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+and    _adlsplatformus.productData.productInteraction <> ''
+group  by _adlsplatformus.productData.productInteraction;
+
+
+Module 4 > Exercise 5 > Task 4 > Step 2
+select distinct _adlsplatformus.identification.core.ecid
+from   aep_demo_luma_telco_website_interactions_dataset
+where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+and    web.webPageDetails.name = 'Cancel Service'
+group  by _adlsplatformus.identification.core.ecid
+limit 10;
+
+
+

@@ -1,0 +1,166 @@
+Exercise codes and commands in the order of module number > exercise number>task number>step number
+
+Module 4 > Exercise 7 > Task 1 > Step 2
+
+SELECT
+  webPage,
+  webPage_2,
+  webPage_3,
+  webPage_4,
+  count(*) journeys
+FROM
+  (
+      SELECT
+        webPage,
+        NEXT(webPage, 1, true)
+          OVER(PARTITION BY ecid, session.num
+                ORDER BY timestamp
+                ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING).value
+          AS webPage_2,
+        NEXT(webPage, 2, true)
+          OVER(PARTITION BY ecid, session.num
+                ORDER BY timestamp
+                ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING).value
+          AS webPage_3,
+        NEXT(webPage, 3, true)
+           OVER(PARTITION BY ecid, session.num
+                ORDER BY timestamp
+                ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING).value
+          AS webPage_4,
+        session.depth AS SessionPageDepth
+      FROM (
+            select a._adlsplatformus.identification.core.ecid as ecid,
+                   a.timestamp,
+                   web.webPageDetails.name as webPage,
+                    SESS_TIMEOUT(timestamp, 60 * 30) 
+                       OVER (PARTITION BY a._adlsplatformus.identification.core.ecid
+                             ORDER BY timestamp 
+                             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 
+                  AS session
+            from   aep_demo_luma_telco_website_interactions_dataset a
+            where  a._adlsplatformus.identification.core.ecid in ( 
+                select b._adlsplatformus.identification.core.ecid
+                from   aep_demo_luma_telco_website_interactions_dataset b
+                where  b._adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+                and    b.web.webPageDetails.name = 'Cancel Service'
+            )
+        )
+)
+WHERE SessionPageDepth=1
+and   webpage_3 = 'Cancel Service'
+GROUP BY webPage, webPage_2, webPage_3, webPage_4
+ORDER BY journeys DESC
+LIMIT 10;
+
+
+
+Module 4 > Exercise 7 > Task 2 > Step 2
+
+select * from (
+       select _adlsplatformus.identification.core.ecid as ecid,
+              web.webPageDetails.name as webPage,
+              TIME_BETWEEN_NEXT_MATCH(timestamp, web.webPageDetails.name='Call Start', 'seconds')
+              OVER(PARTITION BY _adlsplatformus.identification.core.ecid
+                  ORDER BY timestamp
+                  ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+              AS contact_callcenter_after_seconds
+       from   aep_demo_luma_telco_website_interactions_dataset
+       where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+       and    web.webPageDetails.name in ('Cancel Service', 'Call Start')
+) r
+where r.webPage = 'Cancel Service'
+limit 15;
+
+
+
+Module 4 > Exercise 7 > Task 3 > Step 2
+
+select r.*,
+       c._adlsplatformus.callDetails.callFeeling,
+       c._adlsplatformus.callDetails.callTopic,
+       c._adlsplatformus.callDetails.contractCancelled
+from (
+       select _adlsplatformus.identification.core.ecid ecid,
+              web.webPageDetails.name as webPage,
+              TIME_BETWEEN_NEXT_MATCH(timestamp, web.webPageDetails.name='Call Start', 'seconds')
+              OVER(PARTITION BY _adlsplatformus.identification.core.ecid
+                  ORDER BY timestamp
+                  ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+              AS contact_callcenter_after_seconds
+       from   aep_demo_luma_telco_website_interactions_dataset
+       where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+       and    web.webPageDetails.name in ('Cancel Service', 'Call Start')
+) r
+, aep_demo_luma_telco_call_center_interactions_dataset c
+where r.ecid = c._adlsplatformus.identification.ecid
+and r.webPage = 'Cancel Service'
+limit 15;
+
+
+
+Module 4 > Exercise 7 > Task 4 > Step 2
+
+select r.*,
+       c._adlsplatformus.callDetails.callFeeling,
+       c._adlsplatformus.callDetails.callTopic,
+       l._adlsplatformus.loyaltyDetails.level,
+       l._adlsplatformus.identification.core.crmId
+from (
+       select _adlsplatformus.identification.core.ecid ecid,
+              web.webPageDetails.name as webPage,
+              TIME_BETWEEN_NEXT_MATCH(timestamp, web.webPageDetails.name='Call Start', 'seconds')
+              OVER(PARTITION BY _adlsplatformus.identification.core.ecid
+                  ORDER BY timestamp
+                  ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+              AS contact_callcenter_after_seconds
+       from   aep_demo_luma_telco_website_interactions_dataset
+       where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+       and    web.webPageDetails.name in ('Cancel Service', 'Call Start')
+) r
+, aep_demo_luma_telco_call_center_interactions_dataset c
+, demo_system_profile_dataset_for_crm_global_v1_1 l
+where r.ecid = c._adlsplatformus.identification.ecid
+and r.webPage = 'Cancel Service'
+and l._adlsplatformus.identification.core.ecid = r.ecid
+limit 15;
+
+
+
+Module 4 > Exercise 7 > Task 5 > Step 2
+
+       select r.ecid,
+              r.city,
+              r.countrycode,
+              r.lat as latitude,
+              r.lon as longitude,
+              r.contact_callcenter_after_seconds as seconds_to_contact_callcenter,
+              c._adlsplatformus.callDetails.callFeeling,
+              c._adlsplatformus.callDetails.callTopic,
+              c._adlsplatformus.callDetails.contractCancelled,
+              l._adlsplatformus.loyaltyDetails.level,
+              l._adlsplatformus.identification.core.crmId
+       from (
+              select _adlsplatformus.identification.core.ecid ecid,
+                     placeContext.geo._schema.latitude lat,
+                     placeContext.geo._schema.longitude lon,
+                     placeContext.geo.city,
+                     placeContext.geo.countryCode,
+                     web.webPageDetails.name as webPage,
+                     TIME_BETWEEN_NEXT_MATCH(timestamp, web.webPageDetails.name='Call Start', 'seconds')
+                     OVER(PARTITION BY _adlsplatformus.identification.core.ecid
+                         ORDER BY timestamp
+                         ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+                     AS contact_callcenter_after_seconds
+              from   aep_demo_luma_telco_website_interactions_dataset
+              where  _adlsplatformus.demoEnvironment.brandName like 'Luma Telco'
+              and    web.webPageDetails.name in ('Cancel Service', 'Call Start')
+       ) r
+       , aep_demo_luma_telco_call_center_interactions_dataset c
+       , demo_system_profile_dataset_for_crm_global_v1_1 l
+       where r.ecid = c._adlsplatformus.identification.ecid
+       and r.webPage = 'Cancel Service'
+       and l._adlsplatformus.identification.core.ecid = r.ecid
+       limit 15;
+
+
+
